@@ -45,7 +45,6 @@ cd ~/alicia_ws
 
 将本代码库克隆到您的 Catkin 工作空间的 src 目录下：
 ```bash
-# 确保在 ~/alicia_ws/src 目录下
 git clone https://github.com/Xianova-Robotics/Alicia_duo_leader_ros.git
 ```
 
