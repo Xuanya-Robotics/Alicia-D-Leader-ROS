@@ -1,0 +1,23 @@
+# Build artifacts
+build/
+devel/
+logs/
+install/
+
+# CMake files
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+CTestTestfile.cmake
+compile_commands.json
+
+# ROS specific cache files
+*.pyc
+*~
+catkin_generated/
+
+# IDE specific files (examples)
+.vscode/
+.idea/
+*.swp
+*.swo
