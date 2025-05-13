@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.0.2)
-project(alicia_duo_driver)
+project(alicia_duo_leader_driver)
 
 # 使用C++11标准
 set(CMAKE_CXX_STANDARD 11)
@@ -72,8 +72,8 @@ install(DIRECTORY include/${PROJECT_NAME}/
 catkin_install_python(PROGRAMS
   scripts/serial_data_type_node.py
   scripts/servo_states_node.py
-  scripts/servo_control_node.py
-  scripts/arm_control_demo.py
+  # scripts/servo_control_node.py
+  # scripts/arm_control_demo.py
   DESTINATION ${CATKIN_PACKAGE_BIN_DESTINATION}
 )
 

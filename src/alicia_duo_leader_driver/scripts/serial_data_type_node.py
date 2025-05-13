@@ -39,7 +39,7 @@ class SerialReaderNode:
         self.start_time = time.time()
         
         # 保持原始的变量名称
-        self.pub_2 = rospy.Publisher('/gripper_angle', UInt32MultiArray, queue_size=10)
+        # self.pub_2 = rospy.Publisher('/gripper_angle', UInt32MultiArray, queue_size=10)
         self.pub_4 = rospy.Publisher('/servo_states', UInt8MultiArray, queue_size=10)
         self.pub_6 = rospy.Publisher('/servo_states_6', UInt8MultiArray, queue_size=10)
         self.pub_EE = rospy.Publisher('/error_frame_deal', UInt8MultiArray, queue_size=10)
@@ -75,15 +75,15 @@ class SerialReaderNode:
         
         # === 核心逻辑部分 - 保持不变 ===
         if command == 0x02:
-            # 检查数据长度
-            if len(serial_msg.data) < 6:
-                rospy.logwarn("夹爪角度数据帧长度不足")
-                return
+        #     # 检查数据长度
+            # if len(serial_msg.data) < 6:
+            #     rospy.logwarn("夹爪角度数据帧长度不足")
+            #     return
                 
             gripper_angle = serial_msg.data[4] | (serial_msg.data[5] << 8)
-            gripper_data_msg = UInt32MultiArray()
-            gripper_data_msg.data = [gripper_angle, serial_msg.data[8], serial_msg.data[9]]
-            self.pub_2.publish(gripper_data_msg)
+            # gripper_data_msg = UInt32MultiArray()
+            # gripper_data_msg.data = [gripper_angle, serial_msg.data[8], serial_msg.data[9]]
+            # # self.pub_2.publish(gripper_data_msg)
             
             if self.debug_mode:
                 rospy.loginfo("夹爪角度: %d", gripper_angle)

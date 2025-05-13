@@ -11,7 +11,7 @@ import math
 import time
 import numpy as np
 from std_msgs.msg import UInt8MultiArray, Float32MultiArray, Int32,UInt32MultiArray
-from alicia_duo_driver.msg import ArmJointState
+from alicia_duo_leader_driver.msg import ArmJointState
 
 # 常量定义
 DEG_TO_RAD = math.pi / 180.0  # 角度转弧度系数
@@ -100,8 +100,8 @@ class ServoStatesNode:
         # 订阅者
         self.servo_sub = rospy.Subscriber('/servo_states', UInt8MultiArray, 
                                       self.servo_states_callback, queue_size=10)
-        self.gripper_sub = rospy.Subscriber('/gripper_angle', UInt32MultiArray, 
-                                       self.gripper_angle_callback, queue_size=10)
+        # self.gripper_sub = rospy.Subscriber('/gripper_angle', UInt32MultiArray, 
+        #                                self.gripper_angle_callback, queue_size=10)
     
     def _should_process(self):
         """检查是否应该处理当前数据(节流控制)"""

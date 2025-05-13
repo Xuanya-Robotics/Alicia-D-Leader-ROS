@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>alicia_duo_driver</name>
+  <name>alicia_duo_leader_driver</name>
   <version>1.0.0</version>
   <description>C++ implementation of serial server node</description>
   <maintainer email="user@example.com">User</maintainer>

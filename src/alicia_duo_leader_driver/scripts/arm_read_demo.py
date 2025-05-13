@@ -6,7 +6,7 @@ ROS节点示例：订阅并打印来自 /arm_joint_state 话题的机械臂状�
 """
 
 import rospy
-from alicia_duo_driver.msg import ArmJointState
+from alicia_duo_leader_driver.msg import ArmJointState
 import math
 
 # 常量，用于将弧度转换为角度以便于阅读
