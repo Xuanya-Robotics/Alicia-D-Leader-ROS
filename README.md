@@ -2,7 +2,7 @@
 
 ## 概述
 
-本 ROS 软件包 (`alicia_duo_driver`) 旨在处理与机械臂底层硬件的串口通信，解析接收到的数据，并将机械臂的状态（如关节角度、夹爪状态、按钮信息）发布为标准的 ROS 消息。
+本 ROS 软件包 (`alicia_duo_leader_driver`) 旨在处理与机械臂底层硬件的串口通信，解析接收到的数据，并将机械臂的状态（如关节角度、夹爪状态、按钮信息）发布为标准的 ROS 消息。
 
 该驱动程序包含多个节点，协同工作以实现完整的功能：
 *   **串口服务节点 (`serial_server_node`)**: C++ 实现，负责底层的串口读写和原始数据帧的校验与发布/接收。
@@ -26,7 +26,7 @@
 
 ## 安装与部署
 
-以下步骤将指导您完成 `alicia_duo_driver` 的安装和部署。假设您已经安装了 ROS 并且熟悉基本的 Linux 命令行操作。
+以下步骤将指导您完成 `alicia_duo_leader_driver` 的安装和部署。假设您已经安装了 ROS 并且熟悉基本的 Linux 命令行操作。
 
 ### 1. 环境准备
 
@@ -91,7 +91,7 @@ sudo usermod -a -G dialout $USER
 要启动机械臂的驱动程序和所有相关节点，请运行 `serial_server.launch` 文件。确保机械臂已通过 USB 连接到计算机。
 
 ```bash
-roslaunch alicia_duo_driver serial_server.launch
+roslaunch alicia_duo_leader_driver serial_server.launch
 ```
 
 该命令将启动以下节点：
@@ -102,13 +102,13 @@ roslaunch alicia_duo_driver serial_server.launch
 您可以通过添加参数来修改启动行为，例如启用调试模式或指定串口：
 ```bash
 # 启用调试模式
-roslaunch alicia_duo_driver serial_server.launch debug_mode:=true
+roslaunch alicia_duo_leader_driver serial_server.launch debug_mode:=true
 
 # 指定串口为 ttyUSB0
-roslaunch alicia_duo_driver serial_server.launch port:=ttyUSB0
+roslaunch alicia_duo_leader_driver serial_server.launch port:=ttyUSB0
 
 # 同时指定端口和启用调试
-roslaunch alicia_duo_driver serial_server.launch port:=ttyUSB0 debug_mode:=true
+roslaunch alicia_duo_leader_driver serial_server.launch port:=ttyUSB0 debug_mode:=true
 ```
 
 ### 运行状态读取示例
@@ -120,7 +120,7 @@ roslaunch alicia_duo_driver serial_server.launch port:=ttyUSB0 debug_mode:=true
 3.  运行示例脚本：
 
 ```bash
-rosrun alicia_duo_driver arm_read_demo.py
+rosrun alicia_duo_leader_driver arm_read_demo.py
 ```
 
 您将在终端中看到持续打印的机械臂关节角度（度和弧度）、夹爪角度和按钮状态。
@@ -129,9 +129,9 @@ rosrun alicia_duo_driver arm_read_demo.py
 
 成功部署并启动驱动程序后，最关键的信息来源是 `/arm_joint_state` 话题。该话题发布了机械臂的完整状态，是您开发上层应用（如运动规划、状态监控）时需要订阅的主要接口。
 
-该话题使用自定义的 `alicia_duo_driver/ArmJointState` 消息类型，其结构如下：
+该话题使用自定义的 `alicia_duo_leader_driver/ArmJointState` 消息类型，其结构如下：
 
-*   **`alicia_duo_driver/ArmJointState`**:
+*   **`alicia_duo_leader_driver/ArmJointState`**:
     *   `std_msgs/Header header`: 标准消息头，包含时间戳和坐标系 ID。
     *   `float32 joint1` 到 `float32 joint6`: 六个主要关节的角度，单位为 **弧度 (radians)**。
     *   `float32 gripper`: 夹爪的角度，单位为 **弧度 (radians)**。
@@ -147,9 +147,9 @@ rosrun alicia_duo_driver arm_read_demo.py
 
 | 节点名称                | 类型   | 包                  | 描述                                                                 |
 | :---------------------- | :----- | :------------------ | :------------------------------------------------------------------- |
-| `serial_server_node`    | C++    | `alicia_duo_driver` | 负责底层串口通信、数据帧校验和原始数据收发。                         |
-| `serial_data_type_node` | Python | `alicia_duo_driver` | 订阅原始串口数据，根据指令 ID 分类转发到不同话题。                   |
-| `servo_states_node`     | Python | `alicia_duo_driver` | 处理舵机/夹爪状态，发布标准 `ArmJointState` 消息 (弧度)。            |
+| `serial_server_node`    | C++    | `alicia_duo_leader_driver` | 负责底层串口通信、数据帧校验和原始数据收发。                         |
+| `serial_data_type_node` | Python | `alicia_duo_leader_driver` | 订阅原始串口数据，根据指令 ID 分类转发到不同话题。                   |
+| `servo_states_node`     | Python | `alicia_duo_leader_driver` | 处理舵机/夹爪状态，发布标准 `ArmJointState` 消息 (弧度)。            |
 
 ### 重要话题 (Topics)
 
@@ -161,13 +161,13 @@ rosrun alicia_duo_driver arm_read_demo.py
 | `/servo_states`       | `std_msgs/UInt8MultiArray`        | `serial_data_type_node` | `servo_states_node`                   | 处理后的舵机状态原始数据帧 (指令 ID 0x04)。                            |
 | `/servo_states_6`     | `std_msgs/UInt8MultiArray`        | `serial_data_type_node` | (无标准订阅者)                        | 处理后的扩展舵机状态原始数据帧 (指令 ID 0x06)，用途待定。             |
 | `/error_frame_deal`   | `std_msgs/UInt8MultiArray`        | `serial_data_type_node` | (无标准订阅者)                        | 从串口接收到的错误帧 (指令 ID 0xEE)。                                  |
-| `/arm_joint_state`    | `alicia_duo_driver/ArmJointState` | `servo_states_node`     | `arm_read_demo.py`, 其他用户节点      | **主要的机械臂状态话题**，包含所有关节和夹爪的角度 (弧度) 及按钮状态。 |
+| `/arm_joint_state`    | `alicia_duo_leader_driver/ArmJointState` | `servo_states_node`     | `arm_read_demo.py`, 其他用户节点      | **主要的机械臂状态话题**，包含所有关节和夹爪的角度 (弧度) 及按钮状态。 |
 | `/servo_states_main`  | `std_msgs/Float32MultiArray`      | `servo_states_node`     | (用于向后兼容)                        | 包含 6 个关节角度和夹爪角度 (弧度) 的数组。                            |
 | `/startup_complete`   | `std_msgs/String`                 | `serial_server.launch`  | (无标准订阅者)                        | 在所有核心节点启动后发布一次，表示系统准备就绪。                       |
 
 ### 消息类型 (Messages)
 
-*   **`alicia_duo_driver/ArmJointState`**:
+*   **`alicia_duo_leader_driver/ArmJointState`**:
     *   `std_msgs/Header header`: 标准消息头 (时间戳, frame_id)。
     *   `float32 joint1` 到 `float32 joint6`: 六个主要关节的角度 (弧度)。
     *   `float32 gripper`: 夹爪的角度 (弧度)。
@@ -200,4 +200,4 @@ rosrun alicia_duo_driver arm_read_demo.py
 *   **数据接收不正确或不稳定**:
     *   **检查波特率**: 确认 launch 文件中的 `baudrate` 与机械臂硬件设置完全一致。
     *   **检查连接**: 检查 USB 线缆是否连接牢固，尝试更换 USB 端口或线缆。
-    *   **启用调试模式**: 运行 `roslaunch alicia_duo_driver serial_server.launch debug_mode:=true` 查看原始串口数据，判断问题出在底层通信还是上层解析。
+    *   **启用调试模式**: 运行 `roslaunch alicia_duo_leader_driver serial_server.launch debug_mode:=true` 查看原始串口数据，判断问题出在底层通信还是上层解析。
