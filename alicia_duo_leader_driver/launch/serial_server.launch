@@ -25,6 +25,13 @@
     <param name="rate_limit" value="0.001"/>
   </node>
   
+  <!-- 4. 舵机控制节点 - 负责舵机控制 -->
+  <node name="servo_control_node" pkg="alicia_duo_leader_driver" type="servo_control_node.py" output="$(arg output)">
+    <param name="debug_mode" value="$(arg debug_mode)"/>
+    <param name="servo_count" value="$(arg servo_count)"/>
+    <param name="rate_limit" value="0.001"/>
+  </node>
+  
   <!-- 节点启动完成提示 -->
   <node name="startup_message" pkg="rostopic" type="rostopic" args="pub -1 /startup_complete std_msgs/String 'data: 机械臂控制系统已启动完成'" output="$(arg output)"/>
 </launch>
