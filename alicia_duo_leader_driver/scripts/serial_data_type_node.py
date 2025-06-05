@@ -2,10 +2,10 @@
 # coding=utf-8
 
 import rospy
-from std_msgs.msg import UInt8MultiArray,UInt32MultiArray
+from std_msgs.msg import UInt8MultiArray, Float32MultiArray
 from std_msgs.msg import Int32
 import time
-
+import math
 def print_hex_frame(frame_msg):
     """
         @brief 将整数数组转换为十六进制字符串并打印
@@ -27,6 +27,8 @@ def print_hex_frame(frame_msg):
     rospy.loginfo(hex_output)
 
 class SerialReaderNode:
+    # RAD_TO_DEG = 180.0 / math.pi  # 弧度转角度系数
+    DEG_TO_RAD = math.pi / 180.0  # 角度转弧度系数
     def __init__(self):
         rospy.init_node('read_serial_type_node') # 初始化节点
         
@@ -39,7 +41,8 @@ class SerialReaderNode:
         self.start_time = time.time()
         
         # 保持原始的变量名称
-        self.pub_2 = rospy.Publisher('/gripper_angle', UInt32MultiArray, queue_size=10)
+        self.pub_2 = rospy.Publisher('/gripper_angle', Float32MultiArray, queue_size=10)
+        # self.pub_2 = rospy.Publisher('/gripper_angle', UInt32MultiArray, queue_size=10)
         self.pub_4 = rospy.Publisher('/servo_states', UInt8MultiArray, queue_size=10)
         self.pub_6 = rospy.Publisher('/servo_states_6', UInt8MultiArray, queue_size=10)
         self.pub_EE = rospy.Publisher('/error_frame_deal', UInt8MultiArray, queue_size=10)
@@ -75,18 +78,42 @@ class SerialReaderNode:
         
         # === 核心逻辑部分 - 保持不变 ===
         if command == 0x02:
+
+            button1 = False
+            button2 = False
+
+            frame = serial_msg.data
         #     # 检查数据长度
-            if len(serial_msg.data) < 6:
-                rospy.logwarn("夹爪角度数据帧长度不足")
-                return
+            if len(serial_msg.data) >= 10:  # Ensure there are enough bytes
+                button1 = (frame[8] & 0x01) != 0
+                button2 = (frame[9] & 0x01) != 0
                 
-            gripper_angle = serial_msg.data[4] | (serial_msg.data[5] << 8)
-            gripper_data_msg = UInt32MultiArray()
-            gripper_data_msg.data = [gripper_angle, serial_msg.data[8], serial_msg.data[9]]
-            self.pub_2.publish(gripper_data_msg)
+            # 检查最小长度
+            if len(frame) < 8:
+                rospy.logwarn("夹爪数据帧长度不足")
+                return
+            if button1:
+                gripper_raw = frame[6] | (frame[7] << 8)
+            # 从字节4-5提取夹爪角度
+            else:
+                gripper_raw = frame[4] | (frame[5] << 8)
+        
+            # 范围检查
+            if gripper_raw < 2048 or gripper_raw > 2900:
+                gripper_raw = max(2048, min(gripper_raw, 2900))
             
+            
+            gripper_data_msg = Float32MultiArray()
+
+            angle_deg = (gripper_raw - 2048) / 8.52
+            
+            # 转换为弧度
+            gripper_rad = angle_deg * self.DEG_TO_RAD
+            # gripper_data_msg = UInt32MultiArray()
+            gripper_data_msg.data = [gripper_rad, float(serial_msg.data[8]), float(serial_msg.data[9])]#[gripper_rad, float(button1), float(button2)]
+            self.pub_2.publish(gripper_data_msg)            
             if self.debug_mode:
-                rospy.loginfo("夹爪角度: %d", gripper_angle)
+                rospy.loginfo("夹爪角度: %d", gripper_raw)
                 
         elif command == 0x04:
             self.pub_4.publish(serial_msg)
