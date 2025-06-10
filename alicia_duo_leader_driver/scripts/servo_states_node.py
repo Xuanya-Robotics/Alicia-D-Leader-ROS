@@ -100,8 +100,8 @@ class ServoStatesNode:
         # 订阅者
         self.servo_sub = rospy.Subscriber('/servo_states', UInt8MultiArray, 
                                       self.servo_states_callback, queue_size=10)
-        # self.gripper_sub = rospy.Subscriber('/gripper_angle', UInt32MultiArray, 
-        #                                self.gripper_angle_callback, queue_size=10)
+        self.gripper_sub = rospy.Subscriber('/gripper_angle', Float32MultiArray, 
+                                       self.gripper_angle_callback, queue_size=10)
     
     def _should_process(self):
         """检查是否应该处理当前数据(节流控制)"""
@@ -111,6 +111,15 @@ class ServoStatesNode:
             return True
         return False
     
+    def gripper_angle_callback(self, msg):
+        """layout: 
+        dim: []
+        data_offset: 0
+        data: [0.6616682410240173, 1.0, 0.0]
+        msg data
+        """
+        self.gripper_angle_rad = msg.data[0] if len(msg.data) > 0 else 0.0
+        # self.gripper_angle_rad = gripper
 
     def servo_states_callback(self, msg):
         """处理舵机状态数据"""
