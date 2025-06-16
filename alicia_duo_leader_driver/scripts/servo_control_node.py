@@ -9,8 +9,7 @@
 import rospy
 import math
 import numpy as np
-from std_msgs.msg import UInt8MultiArray, MultiArrayDimension,Float32, Bool
-from alicia_duo_leader_driver.msg import ArmJointState
+from std_msgs.msg import UInt8MultiArray, Bool
 
 # 常量定义
 RAD_TO_DEG = 180.0 / math.pi  # 弧度转角度系数
