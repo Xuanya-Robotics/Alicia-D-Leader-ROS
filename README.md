@@ -37,8 +37,8 @@
 如果您还没有 Catkin 工作空间，请创建一个：
 ```bash
 # 创建工作空间目录
-mkdir -p ~/alicia_ws
-cd ~/alicia_ws
+mkdir -p ~/alicia_leader_ws
+cd ~/alicia_leader_ws
 ```
 
 ### 3. 获取代码
@@ -52,7 +52,7 @@ git clone https://github.com/Xianova-Robotics/Alicia_duo_leader_ros.git ./src/
 
 进入工作空间根目录，并使用 `rosdep` 安装软件包依赖：
 ```bash
-cd ~/alicia_ws
+cd ~/alicia_leader_ws
 rosdep install --from-paths src --ignore-src -r -y
 ```
 *如果 `rosdep` 提示找不到某些依赖，您可能需要手动安装 (例如 `sudo apt-get install ros-<ros-distro>-serial`)。*
@@ -61,7 +61,7 @@ rosdep install --from-paths src --ignore-src -r -y
 
 使用 `catkin_make` 编译工作空间中的所有软件包：
 ```bash
-cd ~/alicia_ws
+cd ~/alicia_leader_ws
 catkin_make
 ```
 *编译过程可能需要一些时间。如果遇到错误，请检查依赖项是否已正确安装以及代码是否完整。*
@@ -70,7 +70,7 @@ catkin_make
 
 每次打开新的终端时，都需要 source 工作空间的配置文件，以便 ROS 能够找到您的软件包：
 ```bash
-echo "source ~/alicia_ws/devel/setup.bash" >> ~/.bashrc
+echo "source ~/alicia_leader_ws/devel/setup.bash" >> ~/.bashrc
 source ~/.bashrc
 ```
 *如果您使用的是 `zsh`，请将 `.bashrc` 替换为 `.zshrc`。*
